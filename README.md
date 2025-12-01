@@ -172,8 +172,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Authors
 
-- **Francisco Parra** - Departamento de Ingeniería Industrial, Universidad de Santiago de Chile
-- **Valentina Astudillo** - Departamento de Ingeniería Industrial, Universidad de Santiago de Chile
+- **Francisco Parra** - Departamento de Ingeniería Informática, Universidad de Santiago de Chile
+- **Valentina Astudillo** - Departamento de Geología, Universidad de Chile
 
 ## Acknowledgments
 
