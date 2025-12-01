@@ -1,0 +1,109 @@
+# PM2.5 Santiago - Git Ignore for GitHub Repository
+# Updated for paper submission
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+env/
+venv/
+ENV/
+pm25-santiago/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Raw data (too large, users should download from sources)
+data/raw/
+
+# Large temporary files
+*.hdf5
+*.h5
+*.nc
+
+# Model files (can be regenerated)
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+models/*.pth
+models/*.onnx
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+cache/
+
+# GEE credentials
+.config/earthengine/
+credentials.json
+
+# Compressed files
+*.zip
+*.tar
+*.gz
+*.rar
+
+# Documentation build
+docs/_build/
+
+# Development files (not needed for reproduction)
+test_*.py
+debug_*.py
+inspect_*.py
+retry_*.py
+*_OLD.log
+DESCARGA_COMPLETADA.txt
+OVERNIGHT_DOWNLOAD_INFO.md
+PROGRESS_REPORT.md
+PROJECT_STATUS.md
+PROJECT_SUMMARY.md
+QUICK_REFERENCE.txt
+SESION_RESUMEN.md
+GETTING_STARTED.md
+download_*.sh
+download_*.log
+*.pdf
+
+# ElsArticle (manuscript, separate from code repo)
+elsarticle/

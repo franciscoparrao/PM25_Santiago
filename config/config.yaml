@@ -1,0 +1,287 @@
+# PM2.5 Santiago Project Configuration
+# Last updated: 2025-11-10
+
+# Study Area
+study_area:
+  name: "Santiago Metropolitan Region"
+  country: "Chile"
+  bbox:
+    # Bounding box: [min_lon, min_lat, max_lon, max_lat]
+    west: -71.0
+    south: -33.8
+    east: -70.4
+    north: -33.2
+  crs: "EPSG:4326"
+
+# Time Period
+time_period:
+  start_date: "2019-01-01"
+  end_date: "2025-11-10"
+  training_split: 0.70  # 70% for training
+  validation_split: 0.15  # 15% for validation
+  test_split: 0.15  # 15% for testing
+
+# Google Earth Engine Datasets
+gee_datasets:
+  sentinel5p:
+    no2:
+      collection: "COPERNICUS/S5P/OFFL/L3_NO2"
+      band: "NO2_column_number_density"
+      scale: 7000
+    so2:
+      collection: "COPERNICUS/S5P/OFFL/L3_SO2"
+      band: "SO2_column_number_density"
+      scale: 7000
+    co:
+      collection: "COPERNICUS/S5P/OFFL/L3_CO"
+      band: "CO_column_number_density"
+      scale: 7000
+    o3:
+      collection: "COPERNICUS/S5P/OFFL/L3_O3"
+      band: "O3_column_number_density"
+      scale: 7000
+    aod:
+      collection: "COPERNICUS/S5P/OFFL/L3_AER_AI"
+      band: "absorbing_aerosol_index"
+      scale: 7000
+
+  modis:
+    aod:
+      collection: "MODIS/061/MCD19A2_GRANULES"
+      band: "Optical_Depth_047"
+      scale: 1000
+    lst:
+      collection: "MODIS/061/MOD11A1"
+      band: "LST_Day_1km"
+      scale: 1000
+    ndvi:
+      collection: "MODIS/061/MOD13A2"
+      band: "NDVI"
+      scale: 1000
+
+  era5:
+    collection: "ECMWF/ERA5_LAND/HOURLY"
+    bands:
+      - "temperature_2m"
+      - "dewpoint_temperature_2m"
+      - "surface_pressure"
+      - "u_component_of_wind_10m"
+      - "v_component_of_wind_10m"
+      - "total_precipitation_hourly"
+    scale: 11132  # ERA5-Land resolution
+    temporal_resolution: "hourly"  # Will need daily aggregation
+
+  auxiliary:
+    population:
+      collection: "WorldPop/GP/100m/pop"
+      band: "population"
+      scale: 100
+    elevation:
+      collection: "USGS/SRTMGL1_003"
+      band: "elevation"
+      scale: 30
+
+# SINCA Monitoring Stations
+sinca:
+  base_url: "https://sinca.mma.gob.cl/index.php"
+  stations:
+    # List of station IDs in Santiago Metropolitan Region
+    - "Cerrillos"
+    - "Cerro Navia"
+    - "El Bosque"
+    - "Independencia"
+    - "La Florida"
+    - "Las Condes"
+    - "Pudahuel"
+    - "Puente Alto"
+    - "Quilicura"
+    - "Santiago Centro"
+    - "Talagante"
+    - "Parque O'Higgins"
+    - "Las Condes 2"
+    - "La Reina"
+    - "Ñuñoa"
+    - "Providencia"
+    - "Vitacura"
+    - "Lo Prado"
+    - "Maipú"
+    - "San Bernardo"
+    - "Colina"
+    - "Melipilla"
+    - "Peñaflor"
+
+  pollutants:
+    - "PM25"
+    - "PM10"
+    - "O3"
+    - "NO2"
+    - "SO2"
+    - "CO"
+
+  temporal_resolution: "1H"  # Hourly data
+  aggregation: "daily"  # Aggregate to daily for matching with satellite
+
+# Feature Engineering
+features:
+  satellite:
+    - "no2"
+    - "so2"
+    - "co"
+    - "o3"
+    - "s5p_aod"
+    - "modis_aod"
+    - "lst"
+    - "ndvi"
+
+  meteorological:
+    - "temperature_mean"
+    - "temperature_min"
+    - "temperature_max"
+    - "dewpoint"
+    - "precipitation"
+    - "pressure"
+    - "wind_u"
+    - "wind_v"
+    - "wind_speed"
+    - "wind_direction"
+
+  temporal:
+    - "hour"
+    - "day_of_week"
+    - "day_of_month"
+    - "month"
+    - "season"
+    - "is_weekend"
+    - "is_holiday"
+
+  spatial:
+    - "elevation"
+    - "population_density"
+    - "distance_to_roads"  # To be computed
+    - "land_use_type"  # To be computed
+
+  lag_features:
+    - "pm25_lag1"  # t-1 (yesterday)
+    - "pm25_lag2"  # t-2
+    - "pm25_lag7"  # t-7 (last week)
+    - "pm25_ma3"   # 3-day moving average
+    - "pm25_ma7"   # 7-day moving average
+
+# Machine Learning Models
+models:
+  baseline:
+    - "linear_regression"
+    - "persistence"
+
+  traditional_ml:
+    random_forest:
+      n_estimators: [100, 200, 300, 500]
+      max_depth: [10, 20, 30, None]
+      min_samples_split: [2, 5, 10]
+      min_samples_leaf: [1, 2, 4]
+
+    xgboost:
+      n_estimators: [100, 200, 300, 500]
+      max_depth: [3, 5, 7, 10]
+      learning_rate: [0.01, 0.05, 0.1, 0.3]
+      subsample: [0.7, 0.8, 0.9, 1.0]
+      colsample_bytree: [0.7, 0.8, 0.9, 1.0]
+
+    lightgbm:
+      n_estimators: [100, 200, 300, 500]
+      max_depth: [3, 5, 7, 10]
+      learning_rate: [0.01, 0.05, 0.1, 0.3]
+      num_leaves: [20, 31, 50, 100]
+
+  ensemble:
+    method: "weighted_average"
+    weights: "optimized"  # Or specify: [0.3, 0.4, 0.3]
+
+# Hyperparameter Tuning
+hyperparameter_tuning:
+  method: "bayesian"  # Options: "grid", "random", "bayesian"
+  n_trials: 100
+  cv_folds: 5
+  scoring: "neg_root_mean_squared_error"
+  n_jobs: -1  # Use all available cores
+
+# Evaluation Metrics
+evaluation:
+  metrics:
+    - "r2"
+    - "rmse"
+    - "mae"
+    - "mape"
+    - "mbe"  # Mean Bias Error
+
+  validation_strategy:
+    - "temporal_split"
+    - "spatial_cv"  # Leave-one-station-out
+    - "k_fold_cv"   # k-fold cross-validation
+
+  performance_threshold:
+    r2_min: 0.75
+    rmse_max: 12.0  # μg/m³
+
+# Visualization
+visualization:
+  map:
+    basemap: "OpenStreetMap"
+    cmap: "YlOrRd"  # Color map for PM2.5
+    figsize: [12, 10]
+
+  plots:
+    dpi: 300
+    format: "png"
+    style: "seaborn-v0_8-darkgrid"
+
+# Output Paths
+paths:
+  data:
+    raw: "data/raw"
+    processed: "data/processed"
+    external: "data/external"
+
+  models: "models"
+
+  results:
+    figures: "results/figures"
+    tables: "results/tables"
+    reports: "results/reports"
+
+  logs: "logs"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/pm25_santiago.log"
+
+# Reproducibility
+random_seed: 42
+
+# Computation
+computation:
+  n_jobs: -1  # Use all available cores
+  use_gpu: false
+  batch_size: 1000  # For batch processing
+
+# Data Quality Control
+quality_control:
+  remove_outliers: true
+  outlier_method: "iqr"  # Options: "iqr", "zscore"
+  outlier_threshold: 3.0
+
+  missing_data:
+    max_missing_fraction: 0.3  # Maximum 30% missing data
+    imputation_method: "interpolate"  # Options: "mean", "median", "interpolate", "knn"
+
+  valid_range:
+    pm25:
+      min: 0
+      max: 500  # μg/m³
+
+# API Keys (DO NOT COMMIT - use .env file)
+api_keys:
+  gee: ""  # Set via environment variable or .env file
+  sinca: ""  # If required

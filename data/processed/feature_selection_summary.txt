@@ -1,0 +1,46 @@
+FEATURE SELECTION SUMMARY
+======================================================================
+
+Total features iniciales: 33
+Features seleccionadas: 4
+Features eliminadas: 29
+
+FEATURES SELECCIONADAS:
+----------------------------------------------------------------------
+  ✓ pm25_diff1
+  ✓ pm25_lag1
+  ✓ pm25_ma7
+  ✓ pm25_std7
+
+
+FEATURES ELIMINADAS:
+----------------------------------------------------------------------
+  ✗ atmospheric_stability
+  ✗ day_of_week
+  ✗ day_of_year
+  ✗ dewpoint_celsius
+  ✗ distance_to_center_km
+  ✗ elevation_normalized
+  ✗ era5_dewpoint_temperature_2m
+  ✗ era5_surface_pressure
+  ✗ era5_temperature_2m
+  ✗ era5_total_precipitation_hourly
+  ✗ era5_u_component_of_wind_10m
+  ✗ era5_v_component_of_wind_10m
+  ✗ humidity_aod_interaction
+  ✗ is_weekend
+  ✗ modis_aod
+  ✗ pm25_lag7
+  ✗ pm25_ma30
+  ✗ precipitation_sum7
+  ✗ quarter
+  ✗ relative_humidity
+  ✗ s5p_no2
+  ✗ season
+  ✗ surface_pressure_hpa
+  ✗ temp_aod_interaction
+  ✗ temperature_celsius
+  ✗ wind_direction_deg
+  ✗ wind_direction_rad
+  ✗ wind_no2_interaction
+  ✗ wind_speed

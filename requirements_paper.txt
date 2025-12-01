@@ -1,0 +1,32 @@
+# PM2.5 Santiago - Paper Dependencies
+# As declared in: Parra & Astudillo (2025), Environmental Modelling & Software
+# Python version: 3.12
+
+# Core ML and forecasting
+xgboost==2.0.3
+pandas==2.1.4
+scikit-learn==1.3.2
+pmdarima==2.0.4
+prophet==1.1.5
+
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.1
+
+# Satellite data acquisition
+earthengine-api==0.1.384
+
+# Additional dependencies (required by main packages)
+numpy>=1.24.0
+scipy>=1.10.0
+statsmodels>=0.14.0
+
+# Geospatial
+geopandas>=0.14.0
+shapely>=2.0.0
+rasterio>=1.3.0
+
+# Utilities
+tqdm>=4.65.0
+joblib>=1.3.0
+pyyaml>=6.0

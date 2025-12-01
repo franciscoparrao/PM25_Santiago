@@ -1,0 +1,93 @@
+# PM2.5 Santiago - Git Ignore File
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+env/
+venv/
+ENV/
+pm25-santiago/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Data files (too large for git)
+data/raw/
+data/processed/
+*.csv
+*.hdf5
+*.h5
+*.nc
+*.tif
+*.tiff
+*.geotiff
+
+# Model files
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+models/*.pth
+models/*.onnx
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Results (if too large)
+# results/figures/*.png
+# results/tables/*.csv
+
+# GEE credentials
+.config/earthengine/
+credentials.json
+
+# Compressed files
+*.zip
+*.tar
+*.gz
+*.rar
+
+# Documentation build
+docs/_build/
