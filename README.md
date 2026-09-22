@@ -5,15 +5,17 @@
 
 This repository contains the code and data for the paper:
 
-> **Parra, F. & Astudillo, V.** (2025). Spatiotemporal PM2.5 Prediction in Santiago, Chile: Integrating Satellite Data, Machine Learning Forecasting, and Geostatistical Interpolation. *Environmental Modelling & Software*.
+> **Parra, F. & Astudillo, V.** (2025). Machine Learning for PM2.5 Forecasting in Inversion-Dominated Basins: Where It Adds Value over Persistence, Validated across Santiago and Salt Lake City. *Atmospheric Pollution Research*.
 
 ## Abstract
 
-This study develops a hybrid framework combining XGBoost-based temporal forecasting with regression kriging for spatial interpolation of PM2.5 concentrations in Santiago, Chile. Using 6 years of data (2019-2024) from 11 SINCA monitoring stations and satellite-derived features, we achieve:
+This study contrasts machine learning for two distinct PM2.5 prediction tasks in Santiago, Chile: temporal forecasting at monitored sites and spatial interpolation to unmeasured locations. Using 7 years of data (January 2019 – November 2025) from 8 SINCA monitoring stations integrated with ERA5 meteorology and Sentinel-5P satellite observations, we find:
 
-- **Temporal forecasting**: R² = 0.76, RMSE = 8.52 μg/m³ (1-day horizon)
-- **Spatial interpolation**: R² = 0.89, RMSE = 5.23 μg/m³ via LOSO-CV
-- **107× faster** than ARIMA, **185× faster** than Prophet
+- **Temporal forecasting (XGBoost)**: R² = 0.76, RMSE = 14.06 μg/m³ (1-day horizon), stable across 1–7 day horizons (R² degradation ≤3%)
+- **Spatial interpolation**: not successful (R² = −1.09 under Leave-One-Station-Out CV), revealing the limits of coarse-resolution (7–10 km) satellite features for intra-urban variability
+- **Computational efficiency**: 13.4× speedup over ARIMA in total runtime, enabling daily retraining for operational deployment
+
+The central finding is the *contrasting* success of temporal versus spatial machine learning approaches, with direct implications for air quality forecasting system design in cities with complex topography.
 
 ## Repository Structure
 
@@ -55,7 +57,7 @@ PM25_Santiago/
 
 ```bash
 # Clone the repository
-git clone https://github.com/franciscoparraUSACH/PM25_Santiago.git
+git clone https://github.com/franciscoparrao/PM25_Santiago.git
 cd PM25_Santiago
 
 # Create virtual environment (recommended)
@@ -114,35 +116,41 @@ comparison = compare_models(
 
 ## Key Results
 
-### Temporal Forecasting Performance
+### Temporal Forecasting Performance (1-Day Ahead, walk-forward validation)
 
-| Model   | R²    | RMSE (μg/m³) | MAE (μg/m³) | Time (s) |
-|---------|-------|--------------|-------------|----------|
-| XGBoost | 0.76  | 8.52         | 5.78        | 127.3    |
-| ARIMA   | 0.71  | 9.38         | 6.42        | 13,601   |
-| Prophet | 0.69  | 9.67         | 6.89        | 23,551   |
+| Model           | n      | R²     | RMSE (μg/m³) | MAE (μg/m³) |
+|-----------------|--------|--------|--------------|-------------|
+| **XGBoost**     | 15,128 | **0.76** | 14.06      | 8.54        |
+| Prophet         | 47     | 0.68   | 10.21        | 7.54        |
+| ARIMA           | 47     | 0.58   | 11.60        | 7.20        |
+| Persistence     | 15,128 | 0.74   | 14.72        | 9.11        |
+| Historical Mean | 15,128 | 0.64   | 17.33        | 11.06       |
 
-### Spatial Interpolation (LOSO-CV)
+XGBoost attains the highest R² under honest walk-forward validation (2,161 iterations); ARIMA/Prophet were limited to 47 iterations by computational cost, and reach lower absolute errors only on their smaller, non-comparable test subsets. Total-runtime speedup: **13.4× vs ARIMA**, **~2.9× vs Prophet**.
 
-| Model              | R²   | RMSE (μg/m³) |
-|--------------------|------|--------------|
-| Regression Kriging | 0.89 | 5.23         |
+### Spatial Interpolation (LOSO-CV) — negative result
 
-### Feature Importance (Top 5)
+| Approach                              | R²     | RMSE (μg/m³) |
+|---------------------------------------|--------|--------------|
+| Satellite-feature spatial models (avg)| −1.09  | 25.08        |
+
+Interpolation to **unmeasured** locations was **not successful** (mean R² = −1.09 under Leave-One-Station-Out CV). Coarse satellite resolution (7–10 km) cannot capture intra-urban PM2.5 variability. This negative result is a central, deliberate contrast to the temporal success — not an omission.
+
+### Feature Importance (Top 5, XGBoost 1-day)
 
 | Feature              | Importance |
 |----------------------|------------|
 | pm25_lag_1d          | 38.7%      |
 | pm25_rolling_mean_3d | 28.5%      |
-| temperature_2m       | 8.9%       |
-| relative_humidity    | 6.2%       |
-| wind_speed           | 4.8%       |
+| pm25_diff_1d         | 14.4%      |
+| pm25_rolling_mean_14d| 9.9%       |
+| elevation            | 1.0%       |
 
 ## Data Availability
 
 ### Ground-Truth Data
 - **SINCA** (Sistema de Información Nacional de Calidad del Aire): https://sinca.mma.gob.cl/
-- 11 stations, hourly PM2.5, 2019-2024
+- 8 stations, hourly PM2.5, January 2019 – November 2025
 
 ### Satellite Data (via Google Earth Engine)
 - **Sentinel-5P NO₂**: `COPERNICUS/S5P/NRTI/L3_NO2`
@@ -152,15 +160,31 @@ comparison = compare_models(
 ### Processed Datasets
 All processed datasets used in this study are available in `data/processed/`. See `data/README.md` for detailed documentation.
 
+## Archiving & Reproducibility
+
+**Archived release (DOI):** _pending_ — an archived snapshot of this repository will be deposited on Zenodo and the DOI added here (and to `.zenodo.json` / `CITATION.cff`) upon release. Cite that DOI for the exact code and processed data behind the paper.
+
+**Deterministic environment:**
+- Python 3.12; exact package versions pinned in [`requirements_paper.txt`](requirements_paper.txt) (e.g. `xgboost==2.0.3`, `scikit-learn==1.3.2`).
+- All estimators are seeded (`random_state=42`), so the reported metrics reproduce on the provided processed datasets.
+- Processed datasets are included under `data/processed/`; raw satellite/ground data are not tracked and are re-downloadable from the sources listed under [Data Availability](#data-availability) (Google Earth Engine, SINCA).
+
+**To reproduce the headline results** (after installation above):
+
+```bash
+# Temporal forecasting (R² = 0.76 at 1 day)
+python -c "from src.temporal.forecasting import run_walk_forward_validation as r; r('data/processed/sinca_features_selected.csv', horizons=[1,3,7], n_iterations=2161)"
+```
+
 ## Citation
 
-If you use this code or data, please cite:
+This repository is citable via GitHub's "Cite this repository" button (see [`CITATION.cff`](CITATION.cff)). If you use this code or the derived datasets, please cite the manuscript:
 
 ```bibtex
 @article{parra2025pm25santiago,
-  title={Spatiotemporal PM2.5 Prediction in Santiago, Chile: Integrating Satellite Data, Machine Learning Forecasting, and Geostatistical Interpolation},
+  title={Machine Learning for PM2.5 Forecasting in Inversion-Dominated Basins: Where It Adds Value over Persistence, Validated across Santiago and Salt Lake City},
   author={Parra, Francisco and Astudillo, Valentina},
-  journal={Environmental Modelling \& Software},
+  journal={Atmospheric Pollution Research},
   year={2025},
   publisher={Elsevier}
 }
@@ -173,7 +197,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Authors
 
 - **Francisco Parra** - Departamento de Ingeniería Informática, Universidad de Santiago de Chile
-- **Valentina Astudillo** - Departamento de Geología, Universidad de Chile
+- **Valentina Astudillo** - Independent Researcher, Santiago, Chile
 
 ## Acknowledgments
 

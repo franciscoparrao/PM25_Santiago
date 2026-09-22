@@ -1,0 +1,35 @@
+{
+  "title": "PM25_Santiago: Spatiotemporal PM2.5 forecasting for inversion-dominated basins",
+  "description": "Code and processed data for the paper by Parra & Astudillo on daily PM2.5 prediction for Santiago de Chile (target journal: Atmospheric Pollution Research). Implements XGBoost walk-forward forecasting at 1/3/7-day horizons benchmarked against ARIMA, Prophet and a persistence baseline (with Diebold-Mariano tests), Leave-One-Station-Out spatial interpolation (Regression Kriging), episode-transition-day analysis, conformal uncertainty calibration, and the cross-basin transfer replication in Salt Lake City. Includes data acquisition (Google Earth Engine, SINCA), feature engineering, modeling, and figure generation.",
+  "creators": [
+    {
+      "name": "Parra, Francisco",
+      "affiliation": "Department of Informatics Engineering, Universidad de Santiago de Chile, Santiago, Chile",
+      "orcid": "0009-0006-0435-1854"
+    },
+    {
+      "name": "Astudillo, Valentina",
+      "affiliation": "Independent Researcher, Santiago, Chile"
+    }
+  ],
+  "keywords": [
+    "PM2.5",
+    "air quality forecasting",
+    "machine learning",
+    "XGBoost",
+    "walk-forward validation",
+    "thermal inversion",
+    "Santiago de Chile",
+    "remote sensing",
+    "Sentinel-5P",
+    "regression kriging",
+    "early warning system"
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "access_right": "open",
+  "language": "eng",
+  "version": "v1.0.0",
+  "communities": [],
+  "related_identifiers": []
+}

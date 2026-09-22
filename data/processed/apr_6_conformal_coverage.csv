@@ -1,0 +1,4 @@
+method,coverage_pct,mean_width
+raw_quantile_reg(manuscript),61.0,
+split_conformal,88.5,41.8
+normalized_conformal,87.0,36.5

@@ -162,9 +162,9 @@ def train_seasonal_models(df, feature_cols):
 
         # Preparar X, y
         X_train = train_data[feature_cols].values
-        y_train = train_data['pm25'].values
+        y_train = train_data['pm25_target_1d'].values
         X_test = test_data[feature_cols].values
-        y_test = test_data['pm25'].values
+        y_test = test_data['pm25_target_1d'].values
 
         # Scale
         scaler = StandardScaler()
@@ -288,9 +288,9 @@ def cross_season_validation(df, feature_cols):
 
             # Preparar
             X_train = train_data[feature_cols].values
-            y_train = train_data['pm25'].values
+            y_train = train_data['pm25_target_1d'].values
             X_test = test_data[feature_cols].values
-            y_test = test_data['pm25'].values
+            y_test = test_data['pm25_target_1d'].values
 
             # Scale
             scaler = StandardScaler()
@@ -506,12 +506,17 @@ def main():
     df_daily = create_lag_features(df_daily, target_col='pm25', lags=[1, 2, 3, 7, 14])
     df_daily = create_temporal_features(df_daily)
 
+    # Target de PRONÓSTICO a 1 día adelante (evita el leakage de pm25_diff_1d:
+    # con target de la misma fila se cumplía pm25(t) = pm25_lag_1d + pm25_diff_1d).
+    # Ver docs/REVISION_TEX_REVIEW.md (C1).
+    df_daily['pm25_target_1d'] = df_daily.groupby('estacion')['pm25'].shift(-1)
+
     # Drop NaN
     df_clean = df_daily.dropna().reset_index(drop=True)
     logger.info(f"\nDespués de drop NaN: {len(df_clean):,} registros")
 
     # Features
-    exclude_for_features = ['estacion', 'date', 'datetime', 'archivo', 'validado', 'pm25', 'season', 'season_name']
+    exclude_for_features = ['estacion', 'date', 'datetime', 'archivo', 'validado', 'pm25', 'pm25_target_1d', 'season', 'season_name']
     all_cols = df_clean.columns.tolist()
     feature_cols = [col for col in all_cols if col not in exclude_for_features]
 

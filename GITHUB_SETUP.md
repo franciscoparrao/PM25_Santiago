@@ -5,7 +5,7 @@ Este documento explica cómo preparar y subir el repositorio a GitHub para que c
 ## URL Declarada en el Paper
 
 ```
-https://github.com/franciscoparraUSACH/PM25_Santiago
+https://github.com/franciscoparrao/PM25_Santiago
 ```
 
 ## Pasos para Crear el Repositorio
@@ -53,7 +53,7 @@ Paper: Parra & Astudillo (2025), Environmental Modelling & Software
 - LOSO-CV for spatial validation"
 
 # Agregar remote
-git remote add origin https://github.com/franciscoparraUSACH/PM25_Santiago.git
+git remote add origin https://github.com/franciscoparrao/PM25_Santiago.git
 
 # Subir
 git branch -M main
@@ -102,7 +102,7 @@ El `.gitignore` excluye automáticamente:
 
 Después de subir, visitar:
 ```
-https://github.com/franciscoparraUSACH/PM25_Santiago
+https://github.com/franciscoparrao/PM25_Santiago
 ```
 
 Y verificar que:
@@ -121,7 +121,7 @@ Y verificar que:
 
 ## Notas Importantes
 
-1. **Usuario correcto**: El paper declara `franciscoparraUSACH`, verificar que el usuario de GitHub sea exactamente ese.
+1. **Usuario correcto**: El paper declara `franciscoparrao`, verificar que el usuario de GitHub sea exactamente ese.
 
 2. **Datasets grandes**: Si algún archivo excede 100 MB, usar Git LFS o subirlo a Zenodo/Figshare y enlazar.
 

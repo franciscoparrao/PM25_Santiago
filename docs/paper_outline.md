@@ -476,4 +476,4 @@
 
 **Version:** 1.0
 **Date:** 2025-11-10
-**Author:** Francisco Parrao
+**Author:** Francisco Parra

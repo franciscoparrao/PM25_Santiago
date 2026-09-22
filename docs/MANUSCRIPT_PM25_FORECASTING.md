@@ -17,7 +17,7 @@
 
 **Methods**: We analyzed 7 years (2019-2025) of hourly PM2.5 data from 8 monitoring stations in Santiago, integrated with ERA5 meteorological reanalysis and Sentinel-5P satellite observations. We compared XGBoost, ARIMA, and Prophet models for temporal forecasting using walk-forward validation (2,161 iterations). Spatial generalization was evaluated using Leave-One-Station-Out cross-validation (LOSO-CV). Seasonal robustness was assessed across summer, autumn, winter, and spring periods.
 
-**Results**: XGBoost significantly outperformed classical models for temporal forecasting (R² = 0.76, RMSE = 14.06 μg/m³) compared to Prophet (R² = 0.68) and ARIMA (R² = 0.58). Model performance remained stable across forecast horizons of 1, 3, and 7 days (R² degradation < 3%). Seasonal analysis revealed excellent performance in winter (R² = 0.99, 724 critical episodes) despite higher pollution variability. For critical episode detection (PM2.5 ≥ 80 μg/m³), the system achieved 69% precision and 58% recall. In contrast, spatial interpolation performed poorly (R² = -1.09 in LOSO-CV), indicating that current satellite data resolution (7-10 km) cannot capture intra-urban variability.
+**Results**: XGBoost achieved the highest R² among the tested temporal models (0.76, RMSE = 14.06 μg/m³) vs Prophet (0.68) and ARIMA (0.58), though the classical models attained lower absolute errors on their smaller test subsets. Model performance remained stable across forecast horizons of 1, 3, and 7 days (R² degradation ≤ 3%), widening the advantage over a persistence baseline from +3% at 1 day to +103% at 7 days (Diebold–Mariano p < 1e-4). Seasonal analysis showed forecast skill varying from R² = 0.90 (summer) to 0.71 (winter), lowest during high-pollution winter (which concentrates 724 critical episodes). For critical episode detection (PM2.5 ≥ 80 μg/m³), the system achieved 69% precision and 58% recall. In contrast, spatial interpolation performed poorly (R² = -1.09 in LOSO-CV), indicating that current satellite data resolution (7-10 km) cannot capture intra-urban variability.
 
 **Conclusions**: XGBoost-based forecasting with meteorological and satellite features provides accurate 1-7 day PM2.5 predictions suitable for early warning systems in Santiago. The integration of external environmental drivers (wind patterns, precipitation, NO₂) is critical for superior performance over univariate time series models. However, spatial interpolation to new locations requires higher-resolution features capturing local sources (traffic, land use). Our findings demonstrate the contrasting success of temporal versus spatial machine learning approaches for urban air quality prediction, with implications for designing operational forecasting systems in other cities with complex topography.
 
@@ -37,11 +37,13 @@ Early warning systems that accurately forecast PM2.5 concentrations 1-7 days in 
 
 Traditional air quality forecasting has relied on chemical transport models (CTMs) such as WRF-Chem and CMAQ, which simulate atmospheric chemistry and pollutant dispersion (Baklanov et al., 2014). While physically-based, these models are computationally intensive, require detailed emission inventories, and often struggle with local-scale predictions in complex terrain.
 
+In Chile, air quality authorities operate a two-track operational system for critical episode management (*Gestión de Episodios Críticos*, GEC) in the Santiago Metropolitan Region: a statistical regression model built on synoptic meteorological indices (the Cassmassi model, extending earlier objective forecasting work for the basin, Rutllant & Garreaud 1995) for PM10, and the WRF-Chem chemical transport model for PM2.5. An independent evaluation of this operational system for 2020-2022 found the statistical PM10 model correctly predicted **0% of declared pre-emergency episodes**, with **over 60%** of its declared episodes being false alarms, whereas the WRF-Chem-based PM2.5 forecast achieved **over 70%** overall accuracy with **fewer than 27%** of critical episodes missed (PARTICULAS 2023). This documented gap in the operational statistical forecasting system, in particular, motivates the development of more robust, data-driven alternatives such as the one presented here.
+
 Statistical and machine learning approaches have emerged as promising alternatives:
 
 **Time Series Models**: ARIMA and seasonal variants (SARIMA) have been widely applied for PM2.5 forecasting (Kumar & Goyal, 2011). These univariate models capture autocorrelation and seasonality but cannot incorporate external meteorological drivers.
 
-**Machine Learning**: Random Forests, Support Vector Machines, and gradient boosting models (XGBoost, LightGBM) have shown superior performance by integrating meteorological variables, traffic data, and satellite observations (Qi et al., 2019; Zhou et al., 2020). Recent advances using deep learning (LSTM, GRU) have achieved R² > 0.80 for 24-hour forecasts (Wen et al., 2021).
+**Machine Learning**: Random Forests, Support Vector Machines, and gradient boosting models (XGBoost, LightGBM) have shown superior performance by integrating meteorological variables, traffic data, and satellite observations (Qi et al., 2019; Ma et al., 2020). Recent advances using deep learning (LSTM, GRU) have achieved R² > 0.80 for 24-hour forecasts (Wen et al., 2019).
 
 **Hybrid Models**: Prophet (Taylor & Letham, 2018) combines trend, seasonality, and holiday effects in a Bayesian framework, offering uncertainty quantification and robustness to missing data.
 
@@ -75,7 +77,7 @@ Our findings provide practical guidance for designing operational air quality fo
 
 ### 2.1 Study Area
 
-Santiago de Chile (33.5°S, 70.6°W) is located in a basin surrounded by the Andes Mountains (east, 3,000-6,000 m elevation) and the Coastal Range (west, 1,000-2,000 m). The city experiences Mediterranean climate with dry summers (December-February) and wet winters (June-August). Thermal inversions are frequent during winter due to radiative cooling and stable atmospheric conditions, trapping pollutants and causing severe PM2.5 episodes (Gramsch et al., 2006).
+Santiago de Chile (33.5°S, 70.6°W) is located in a basin surrounded by the Andes Mountains (east, 3,000-6,000 m elevation) and the Coastal Range (west, 1,000-2,000 m). The city experiences Mediterranean climate with dry summers (December-February) and wet winters (June-August). Thermal inversions are frequent during winter due to radiative cooling and stable atmospheric conditions, trapping pollutants and causing severe PM2.5 episodes (Gramsch et al., 2006); recent boundary-layer observations confirm this basin traps a shallow convective layer that fails to grow above the surrounding topography on polluted winter days (Muñoz et al., 2025).
 
 **Study Period**: January 2019 - November 2025 (7 years)
 
@@ -286,18 +288,18 @@ Table 1 shows the performance comparison of XGBoost, ARIMA, and Prophet for 1-da
 | **XGBoost** | 15,128 | **0.7638** | 14.06 | 8.54 | 30.73 |
 | Prophet | 47 | 0.6767 | 10.21 | 7.54 | 22.39 |
 | ARIMA | 47 | 0.5824 | 11.60 | 7.20 | 18.65 |
-| Persistence | 15,128 | 0.7362 | 14.81 | 9.13 | - |
-| Historical Mean | 15,128 | 0.6400 | 17.30 | 11.04 | - |
+| Persistence | 15,128 | 0.7411 | 14.72 | 9.11 | - |
+| Historical Mean | 15,128 | 0.6414 | 17.33 | 11.06 | - |
 
 *n = number of predictions; Bold indicates best performance*
 
 **Key Findings**:
 
-1. **XGBoost significantly outperformed** classical time series models (R² = 0.76 vs 0.68 for Prophet and 0.58 for ARIMA)
+1. **XGBoost achieved the highest R²** among the tested models (0.76 vs 0.68 for Prophet and 0.58 for ARIMA); the classical models had lower absolute errors on their smaller (n=47) test subsets
 
-2. **XGBoost beat both baselines**:
-   - vs Persistence: +3.7% R², -5.1% RMSE
-   - vs Historical Mean: +19.3% R², -18.7% RMSE
+2. **XGBoost beat both baselines** (identical walk-forward test points):
+   - vs Persistence: +3.1% R², -4.5% RMSE (Diebold–Mariano p < 1e-4)
+   - vs Historical Mean: +19.1% R², -18.9% RMSE
 
 3. **ARIMA/Prophet had fewer predictions** (47 vs 15,128) due to computational constraints, limiting statistical power
 
@@ -307,26 +309,25 @@ Table 1 shows the performance comparison of XGBoost, ARIMA, and Prophet for 1-da
 
 Table 2 shows XGBoost performance degradation across forecast horizons.
 
-**Table 2. XGBoost Performance by Forecast Horizon**
+**Table 2. XGBoost vs Persistence by Forecast Horizon (identical walk-forward test points)**
 
-| Horizon | n | R² | RMSE (μg/m³) | MAE (μg/m³) | Degradation (% R²) |
-|---------|---|-----|--------------|-------------|--------------------|
-| 1-day | 15,128 | 0.7638 | 14.06 | 8.54 | - |
-| 3-day | 15,110 | 0.7406 | 14.73 | 9.21 | -3.0% |
-| 7-day | 15,074 | 0.7437 | 14.62 | 9.18 | -2.6% |
+| Horizon | n | XGB R² | XGB RMSE | Pers. R² | Pers. RMSE | ΔR² (%) | DM test* |
+|---------|---|--------|----------|----------|------------|---------|----------|
+| 1-day | 15,128 | 0.7638 | 14.06 | 0.7411 | 14.72 | +3.1 | p < 1e-4 |
+| 3-day | 15,110 | 0.7406 | 14.73 | 0.4438 | 21.57 | +66.9 | p < 1e-15 |
+| 7-day | 15,074 | 0.7437 | 14.62 | 0.3659 | 22.99 | +103.3 | p < 1e-15 |
+
+*XGBoost MAE: 8.54 / 9.21 / 9.18. \*Diebold–Mariano test on squared-error loss differentials (HAC variance, h−1 lags).*
 
 **Key Findings**:
 
-1. **Minimal degradation** from 1-day to 7-day forecasts (R² drop < 3%)
-2. **RMSE increase modest** (+4.0% at 7 days)
-3. **Practical implication**: Model provides reliable forecasts up to 1 week ahead
+1. **Minimal degradation** from 1-day to 7-day forecasts (R² drop ≤ 3%) — while persistence collapses (0.74 → 0.37)
+2. **The advantage over the naive baseline grows from +3.1% (1 day) to +103% (7 days)**, all significant (DM p < 1e-4)
+3. **Practical implication**: reliable forecasts up to 1 week ahead — precisely the lead time at which naive forecasting is no longer viable
 
-#### 3.1.3 Comparison with Baselines by Horizon
+#### 3.1.3 Transition-day stratification (1-day horizon)
 
-At 7-day ahead:
-- XGBoost R² = 0.7437
-- Persistence R² = 0.3612 (degraded from 0.74 at 1-day)
-- **XGBoost improvement**: +106% better than persistence at 7 days
+On the 12.0% of days with |ΔPM2.5| > 20 μg/m³ (inversion onset/breakup — the days that motivate this work), persistence is uninformative (R² = 0.03, RMSE = 37.1) while XGBoost retains skill (R² = 0.30, RMSE = 31.5). On the remaining 80.8% quasi-stationary days, persistence is near-optimal and even beats XGBoost on RMSE (7.60 vs 9.42) — the model's value concentrates where the naive forecast fails structurally.
 
 ### 3.2 Seasonal Analysis
 
@@ -349,25 +350,27 @@ At 7-day ahead:
 
 #### 3.2.2 Model Performance by Season
 
-**Table 4. XGBoost Performance by Season (80/20 Temporal Split)**
+**Table 4. XGBoost Performance by Season (1-Day-Ahead Forecast, 80/20 Temporal Split)**
 
 | Season | n (test) | R² | RMSE (μg/m³) | MAE (μg/m³) | Overfitting* |
 |--------|----------|-----|--------------|-------------|--------------|
-| Summer | 751 | 0.9976 | 0.98 | 0.54 | 0.0021 |
-| Spring | 815 | 0.9934 | 1.65 | 0.83 | 0.0062 |
-| **Winter** | **865** | **0.9935** | **2.93** | **1.61** | **0.0059** |
-| Autumn | 816 | 0.9854 | 3.65 | 1.59 | 0.0143 |
+| Summer | 751 | 0.902 | 6.29 | 4.52 | 0.082 |
+| Spring | 813 | 0.812 | 8.76 | 5.69 | 0.161 |
+| Autumn | 816 | 0.756 | 15.12 | 10.31 | 0.224 |
+| **Winter** | **865** | **0.712** | **19.45** | **13.94** | **0.235** |
 
 *Overfitting = (Train R² - Test R²)*
 
 **Key Findings**:
 
-1. **Excellent performance in all seasons** (R² > 0.98)
-2. **Winter performance remarkable** despite highest variability (SD = 33.9 μg/m³)
-3. **Minimal overfitting** across all seasons (< 1.5%)
-4. **Autumn slightly worse** (R² = 0.985), possibly due to transitional weather patterns
+1. **Season-dependent performance** (R² 0.71–0.90), highest in low-pollution summer
+2. **Winter is the hardest season** (R² = 0.71) given its higher concentrations and variability (SD = 33.9 μg/m³)
+3. **Larger train–test gap in winter** (0.24) reflects the greater forecasting difficulty
+4. *(Superseded: an earlier run reported R² > 0.98 for all seasons; that was a data-leakage artifact from using a same-day target with `pm25_diff_1d`. See docs/REVISION_TEX_REVIEW.md C1.)*
 
 #### 3.2.3 Feature Importance by Season
+
+*(Note: the per-season importances below come from the earlier same-day run and are superseded — `pm25_diff_1d`'s prominence in winter was a leakage artifact; see docs/REVISION_TEX_REVIEW.md C1. Pending regeneration under the 1-day-ahead setup.)*
 
 **Top 5 Most Important Features**:
 
@@ -387,20 +390,20 @@ At 7-day ahead:
 
 #### 3.2.4 Cross-Season Validation
 
-**Table 5. Cross-Season R² (Train on one season → Test on another)**
+**Table 5. Cross-Season R² (Train on one season → Test on another, 1-day-ahead)**
 
 | Train ↓ / Test → | Summer | Autumn | Winter | Spring |
 |------------------|--------|--------|--------|--------|
-| Summer | - | 0.956 | 0.895 | 0.983 |
-| Autumn | 0.995 | - | 0.984 | 0.997 |
-| **Winter** | **0.998** | **0.998** | - | **0.998** |
-| Spring | 0.979 | 0.949 | 0.886 | - |
+| Summer | - | 0.666 | 0.399 | 0.694 |
+| Autumn | 0.752 | - | 0.560 | 0.372 |
+| **Winter** | **0.588** | **0.747** | - | **0.643** |
+| Spring | 0.794 | 0.703 | 0.445 | - |
 
 **Key Findings**:
 
-1. **Winter-trained models generalize best** (R² > 0.99 on all other seasons)
-2. **Spring/Summer models fail on winter** (R² = 0.89-0.90)
-3. **Implication**: Training on winter data provides most robust model year-round
+1. **Cross-season transfer is limited** (off-diagonal R² 0.37–0.79, mean 0.61)
+2. **Winter is the hardest test season** (R² 0.40–0.64 from other-season models)
+3. **Implication**: train on the full multi-season record (as the walk-forward system does), not season-specific models
 
 ### 3.3 Critical Episode Detection
 
@@ -528,7 +531,7 @@ XGBoost quantile regression (5th, 50th, 95th percentiles) was used to generate 9
 
 ### 4.1 XGBoost Superiority for Temporal Forecasting
 
-Our results demonstrate that XGBoost significantly outperforms classical time series models (ARIMA, Prophet) for PM2.5 forecasting in Santiago (R² = 0.76 vs 0.68 and 0.58). This superiority stems from three key advantages:
+Our results show that XGBoost attains a higher R² than classical time series models (ARIMA, Prophet) for PM2.5 forecasting in Santiago (0.76 vs 0.68 and 0.58), in variance explained — though not on absolute-error metrics. This advantage in R² stems from three key factors:
 
 #### 4.1.1 Integration of Physical Drivers
 
@@ -553,7 +556,7 @@ XGBoost handles missing satellite data (cloud cover gaps) via tree splits, where
 
 ### 4.2 Minimal Degradation Across Forecast Horizons
 
-The modest R² decrease from 1-day (0.76) to 7-day (0.74) forecasts contrasts with typical degradation in shorter-range models (e.g., LSTM studies show 20-30% R² loss at 7 days; Wen et al., 2021). This stability results from:
+The modest R² decrease from 1-day (0.76) to 7-day (0.74) forecasts contrasts with typical degradation in shorter-range models (e.g., LSTM studies show 20-30% R² loss at 7 days; Wen et al., 2019). This stability results from:
 
 1. **Slow PM2.5 dynamics**: Santiago's basin traps pollutants for 3-7 day periods during inversions, maintaining autocorrelation at weekly scales
 2. **Synoptic weather predictability**: ERA5 meteorological forecasts remain skillful at 7 days for large-scale patterns (frontal passages, wind regimes)
@@ -561,18 +564,16 @@ The modest R² decrease from 1-day (0.76) to 7-day (0.74) forecasts contrasts wi
 
 **Practical implication**: 7-day forecasts enable early warning for weekend restrictions and school activity planning.
 
-### 4.3 Seasonal Robustness and Winter Performance
+### 4.3 Seasonal Variation in Performance
 
-Despite winter's 2.2× higher mean PM2.5 and 1.7× higher variability (SD = 33.9 vs 19.7 μg/m³ in summer), XGBoost achieved R² = 0.99 in winter versus 1.00 in summer. This near-equal performance is remarkable given:
+Forecast skill varies markedly with season. Summer, with the lowest and least variable concentrations, is easiest to predict one day ahead (R² = 0.90), whereas winter — despite, or rather because of, its 2.2× higher mean PM2.5 and 1.7× higher variability (SD = 33.9 vs 19.7 μg/m³ in summer) — is the hardest (R² = 0.71, RMSE = 19.5 μg/m³). Winter's difficulty reflects:
 
-- **16.7% of winter days** exceed WHO 24-hour guidelines (80 μg/m³)
+- **16.7% of winter days** exceed the 80 μg/m³ Alert level
 - **Rapid inversions**: PM2.5 can increase from 30 to 150 μg/m³ in 12 hours during stagnation events
 
-Key to winter success:
-1. **PM2.5 diff features**: Daily changes (16.6% importance in winter) capture inversion onset/breakup
-2. **Cross-season training**: Models trained on winter data generalize perfectly to other seasons (R² > 0.99), suggesting winter captures full complexity
+Cross-season transfer is limited: models trained on a single season lose substantial skill on others (off-diagonal mean R² = 0.61), and winter is the least predictable target from other-season models (R² 0.40–0.64). This indicates the model captures season-specific dynamics rather than a single transferable relationship.
 
-**Policy implication**: Single year-round model (trained on winter data) can reliably forecast all seasons, simplifying operational deployment.
+**Policy implication**: operational forecasting should train on the full multi-season record (as the walk-forward system does), not on a single-season model.
 
 ### 4.4 Critical Episode Detection Trade-offs
 
@@ -589,7 +590,7 @@ False Positive (unnecessary alert):
 
 False Negative (missed episode):
 - Health: 100-200 excess respiratory hospitalizations (Ilabaca et al., 1999)
-- Mortality: 5-10 premature deaths per episode (Ostro et al., 1999)
+- Mortality: 5-10 premature deaths per episode (Ostro et al., 1996)
 
 Given health costs dominate, **optimizing for recall** (sensitivity > 80%) may be preferable, even at expense of precision (50%).
 
@@ -723,6 +724,18 @@ ARIMA/Prophet were limited to 47 iterations (vs 2,161 for XGBoost) due to 20-30 
 
 PM2.5 mass concentration does not capture toxicity variations from composition (organic carbon, metals, secondary sulfates). Health impact assessment requires chemical speciation data, which was unavailable.
 
+#### 4.7.5 Baseline and Model Family Choice
+
+We benchmarked XGBoost against ARIMA and Prophet because they represent, respectively, the classical statistical standard (ARIMA/SARIMA, the most widely used univariate baseline in the PM2.5 forecasting literature) and a widely deployed modern Bayesian structural alternative (Prophet), matching this study's stated objective of contrasting machine learning against classical time series approaches. Other tree-based learners cited in the introduction (Random Forest, LightGBM) are architecturally similar to XGBoost and would be expected to perform comparably on this tabular, lag-feature-engineered dataset.
+
+We did not benchmark deep learning models (LSTM, GRU), for three reasons:
+
+1. **Dataset size**: ~16,000 observations is modest for deep sequence models, which typically need substantially larger training sets to outperform gradient boosting once informative lag/rolling-window features are already engineered — exactly the temporal structure LSTMs are designed to learn automatically.
+2. **Operational framing**: this study's contribution rests on low training cost and daily retrainability; an honest 2,161-iteration walk-forward comparison would be computationally prohibitive for recurrent architectures, mirroring the constraint that already limited ARIMA/Prophet to 47 iterations.
+3. **Interpretability**: XGBoost's feature importance analysis directly supports the physical interpretation of inversion dynamics — an advantage recurrent deep learning models do not offer as readily.
+
+A systematic comparison against deep learning architectures, particularly under larger multi-year, multi-city datasets, is a natural direction for future work.
+
 ### 4.8 Generalization to Other Cities
 
 Our findings suggest XGBoost-based forecasting will generalize to cities with:
@@ -743,11 +756,11 @@ This study developed and validated a machine learning-based PM2.5 forecasting sy
 
 ### 5.1 Main Findings
 
-1. **XGBoost significantly outperforms classical time series models** for temporal forecasting (R² = 0.76 vs 0.68 for Prophet and 0.58 for ARIMA), primarily due to integration of meteorological and satellite features that capture physical drivers of pollution dynamics.
+1. **XGBoost achieves the highest R²** among the tested temporal models (0.76 vs 0.68 for Prophet and 0.58 for ARIMA), primarily due to integration of meteorological and satellite features that capture physical drivers — though it does not dominate the classical models on absolute-error metrics (which were evaluated on smaller test subsets).
 
-2. **Forecast accuracy remains stable** from 1-day to 7-day horizons (R² degradation < 3%), enabling reliable early warnings for public health interventions.
+2. **Forecast accuracy remains stable** from 1-day to 7-day horizons (R² degradation ≤ 3%), while the persistence baseline collapses (0.74 → 0.37); the advantage grows from +3% to +103% and concentrates on episode-transition days, enabling reliable early warnings for public health interventions.
 
-3. **Model performance is robust across seasons**, maintaining R² > 0.98 even during high-pollution winter months (mean PM2.5 = 52 μg/m³, 17% of days exceeding critical thresholds).
+3. **Model performance is season-dependent** (R² 0.71–0.90), weakest during high-pollution winter months (mean PM2.5 = 52 μg/m³, 17% of days exceeding critical thresholds).
 
 4. **Critical episode detection** achieves 69% precision and 58% recall for PM2.5 ≥ 80 μg/m³, suitable for operational early warning systems, though optimization for higher recall is recommended given health costs.
 
@@ -836,9 +849,15 @@ Ilabaca, M., Olaeta, I., Campos, E., et al. (1999). Association between levels o
 
 Kumar, A., & Goyal, P. (2011). Forecasting of daily air quality index in Delhi. *Science of the Total Environment*, 409(24), 5517-5523.
 
-Ostro, B., Sanchez, J. M., Aranda, C., & Eskeland, G. S. (1999). Air pollution and mortality: results from Santiago, Chile. *Journal of Exposure Analysis and Environmental Epidemiology*, 9(5), 401-411.
+Muñoz, R. C., Schmitz, R., Alcafuz, R., Huneeus, N., Alzola, C., Arriagada, A., & Martínez, A. (2025). Nonlocal factors of the convective boundary layer and its evening transition observed with fixed and mobile ceilometers in the Santiago Valley. *Journal of Applied Meteorology and Climatology*, 64(10), 1357-1377. https://doi.org/10.1175/JAMC-D-25-0019.1
+
+Ostro, B., Sanchez, J. M., Aranda, C., & Eskeland, G. S. (1996). Air pollution and mortality: results from a study of Santiago, Chile. *Journal of Exposure Analysis and Environmental Epidemiology*, 6(1), 97-114.
+
+PARTICULAS (Ingeniería y Gestión Ambiental ParticuloTech Ltda.) (2023). *Evaluación del Sistema de Pronóstico de Calidad del Aire de la RM en la Gestión de Episodios Críticos de Contaminación*. Technical Report, prepared for SEREMI del Medio Ambiente, Región Metropolitana, Chile.
 
 Qi, Y., Li, Q., Karimian, H., & Liu, D. (2019). A hybrid model for spatiotemporal forecasting of PM2.5 based on graph convolutional neural network and long short-term memory. *Science of the Total Environment*, 664, 1-10.
+
+Rutllant, J., & Garreaud, R. (1995). Meteorological air pollution potential for Santiago, Chile: towards an objective episode forecasting. *Environmental Monitoring and Assessment*, 34, 223-244. https://doi.org/10.1007/BF00554796
 
 Rutllant, J., & Garreaud, R. (2004). Episodes of strong flow down the western slope of the subtropical Andes. *Monthly Weather Review*, 132(3), 611-622.
 
@@ -848,11 +867,11 @@ Taylor, S. J., & Letham, B. (2018). Forecasting at scale. *The American Statisti
 
 van Donkelaar, A., Martin, R. V., Brauer, M., et al. (2016). Global estimates of fine particulate matter using a combined geophysical-statistical method with information from satellites, models, and monitors. *Environmental Science & Technology*, 50(7), 3762-3772.
 
-Wen, C., Liu, S., Yao, X., et al. (2021). A novel spatiotemporal convolutional long short-term neural network for air pollution prediction. *Science of the Total Environment*, 654, 1091-1099.
+Wen, C., Liu, S., Yao, X., et al. (2019). A novel spatiotemporal convolutional long short-term neural network for air pollution prediction. *Science of the Total Environment*, 654, 1091-1099. https://doi.org/10.1016/j.scitotenv.2018.11.086
 
 World Health Organization (WHO). (2021). *WHO global air quality guidelines: particulate matter (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur dioxide and carbon monoxide*. World Health Organization.
 
-Zhou, Y., Chang, F. J., Chang, L. C., et al. (2020). An ensemble learning approach for XGBoost and LightGBM in forecasting hourly PM2.5. *Aerosol and Air Quality Research*, 20(2), 2271-2281.
+Ma, J., Yu, Z., Qu, Y., Xu, J., & Cao, Y. (2020). Application of the XGBoost machine learning method in PM2.5 prediction: A case study of Shanghai. *Aerosol and Air Quality Research*, 20(1), 128-138. https://doi.org/10.4209/aaqr.2019.08.0408
 
 ---
 

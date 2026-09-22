@@ -107,3 +107,17 @@ download_*.log
 
 # ElsArticle (manuscript, separate from code repo)
 elsarticle/
+
+# --- Internal/strategic material (not part of the public paper artifact) ---
+docs/propuesta_colaboracion_*
+docs/cartera_publicaciones_*
+docs/onepager_*
+docs/presentacion_*
+docs/reunion_*
+docs/tarjeta_*
+docs/modelo_pronostico_*
+docs/resumen_cambios_*
+docs/REVISION_TEX_REVIEW.md
+
+# Rust prototype (tangential exploration, not the paper pipeline)
+prototypes/

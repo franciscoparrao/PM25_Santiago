@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+title: "PM25_Santiago: Spatiotemporal PM2.5 forecasting for inversion-dominated basins"
+message: "If you use this software or the derived datasets, please cite the manuscript below."
+type: software
+authors:
+  - given-names: Francisco
+    family-names: Parra
+    affiliation: "Department of Informatics Engineering, Universidad de Santiago de Chile, Santiago, Chile"
+    orcid: "https://orcid.org/0009-0006-0435-1854"
+  - given-names: Valentina
+    family-names: Astudillo
+    affiliation: "Independent Researcher, Santiago, Chile"
+license: MIT
+version: v1.0.0
+repository-code: "https://github.com/franciscoparrao/PM25_Santiago"
+keywords:
+  - PM2.5
+  - air quality forecasting
+  - machine learning
+  - XGBoost
+  - walk-forward validation
+  - thermal inversion
+  - Santiago de Chile
+  - remote sensing
+preferred-citation:
+  type: article
+  title: "Machine Learning for PM2.5 Forecasting in Inversion-Dominated Basins: Where It Adds Value over Persistence, Validated across Santiago and Salt Lake City"
+  authors:
+    - given-names: Francisco
+      family-names: Parra
+      orcid: "https://orcid.org/0009-0006-0435-1854"
+    - given-names: Valentina
+      family-names: Astudillo
+  journal: "Atmospheric Pollution Research"
+  year: 2025
+  # doi: TODO — add manuscript DOI once accepted/published

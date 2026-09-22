@@ -1,0 +1,6 @@
+metric,value,n
+corr_logVC_pm25_level,-0.684,2500
+corr_dlogVC_dPM_all,-0.302,2499
+corr_dlogVC_dPM_transition,-0.506,300
+R2_dPM_vent+precip_transition,0.256,300
+blh_winter_m,481.0,0

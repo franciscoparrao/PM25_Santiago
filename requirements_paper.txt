@@ -1,5 +1,5 @@
 # PM2.5 Santiago - Paper Dependencies
-# As declared in: Parra & Astudillo (2025), Environmental Modelling & Software
+# As declared in: Parra & Astudillo (2025), Atmospheric Pollution Research
 # Python version: 3.12
 
 # Core ML and forecasting

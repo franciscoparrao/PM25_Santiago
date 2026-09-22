@@ -324,7 +324,7 @@ jupyter lab notebooks/
 
 ## 👥 Team
 
-- **Lead Researcher:** Francisco Parrao
+- **Lead Researcher:** Francisco Parra
 - **Collaborators:** TBD (atmospheric science, epidemiology, GIS)
 
 ---
@@ -366,7 +366,7 @@ This project is for academic research purposes.
 
 ## 📧 Contact
 
-- **Francisco Parrao**
+- **Francisco Parra**
 - **Institution:** TBD
 - **Email:** TBD
 
