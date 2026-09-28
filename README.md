@@ -162,7 +162,7 @@ All processed datasets used in this study are available in `data/processed/`. Se
 
 ## Archiving & Reproducibility
 
-**Archived release (DOI):** _pending_ — an archived snapshot of this repository will be deposited on Zenodo and the DOI added here (and to `.zenodo.json` / `CITATION.cff`) upon release. Cite that DOI for the exact code and processed data behind the paper.
+**Archived release (DOI):** [10.5281/zenodo.23019730](https://doi.org/10.5281/zenodo.23019730) — Zenodo archive of the code and processed data behind the paper (DOI reserved; it resolves once the archive is published). Cite this DOI for the exact version of record.
 
 **Deterministic environment:**
 - Python 3.12; exact package versions pinned in [`requirements_paper.txt`](requirements_paper.txt) (e.g. `xgboost==2.0.3`, `scikit-learn==1.3.2`).

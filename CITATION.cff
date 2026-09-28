@@ -12,6 +12,7 @@ authors:
     affiliation: "Independent Researcher, Santiago, Chile"
 license: MIT
 version: v1.0.0
+doi: 10.5281/zenodo.23019730
 repository-code: "https://github.com/franciscoparrao/PM25_Santiago"
 keywords:
   - PM2.5
