@@ -121,3 +121,6 @@ docs/REVISION_TEX_REVIEW.md
 
 # Rust prototype (tangential exploration, not the paper pipeline)
 prototypes/
+
+# Transparency dump (2.6GB: WRF-Chem emissions + Cassmassi/WRF reports) - too large for git
+docs/15714/
